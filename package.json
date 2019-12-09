@@ -1,0 +1,25 @@
+{
+  "name": "react-native-react-native-xf-speech",
+  "version": "1.0.0",
+  "description": "科大飞讯离线语音识别 只支持安卓 only support for andriod",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "tts",
+    "speech"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TSjianjiao/react-native-xfSpeech.git"
+  },
+  "author": "oliver xu",
+  "homepage": "https://github.com/TSjianjiao/react-native-xfSpeech.git",
+  "license": "MIT",
+  "peerDependencies": {
+    "react-native": "*"
+  }
+}
+
