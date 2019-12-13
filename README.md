@@ -1,5 +1,8 @@
 
 # react-native-xf-speech
+[![NPM version](https://badgen.net/npm/v/react-native-xf-speech)](https://www.npmjs.com/package/react-native-xf-speech)
+[![NPM download week](https://badgen.net/npm/dw/react-native-xf-speech)](https://www.npmjs.com/package/react-native-xf-speech)
+
 <del>请忽略本文工地散装英语:cry:</del></br>
 我只是一个会点`rn`的前端，在安卓开发和ios开发上属于编写边学程度，所以可能会有很多bug，请酌情使用
 # 使用前必读(before use) :warning: :warning: :warning: :warning:
@@ -25,7 +28,9 @@ Because I'm good at native development，you can use your own configuration and 
     }
 	.....
 	.....
+	// 建议直接赋值粘贴这段
 	applicationVariants.all { variant ->
+		// 注意这里each改成了all
         variant.outputs.all { output ->
             def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3]
             def abi = output.getFilter(OutputFile.ABI)
@@ -94,10 +99,10 @@ Because I'm good at native development，you can use your own configuration and 
 
 ## Usage
 ### :robot: FOR ANDROID ：
-1. 在`你的项目根目录/android/app/src/main/`下面创建目录`assets`</br>
-create a folder `assets` in `project_root_dir/android/app/src/main/` 
-2. <span id="move-model"></span>移动仓库中[model文件夹](./model)两个文件（`backend_lzl`和`frontend_model`）至`assets`</br>
-move files in [this_repository/model](./model) to `assets` you made
+1. 在`你的项目根目录/android/app/src/main/`下面创建目录`assets\tts`</br>
+create a folder `assets\tts` in `project_root_dir/android/app/src/main/` 
+2. <span id="move-model"></span>移动仓库中[model文件夹](./model)两个文件（`backend_lzl`和`frontend_model`）至`assets\tts`</br>
+move files in [this_repository/model](./model) to `assets\tss` you made
 3. 添加权限 add permission</br>
 在`项目根目录/android/app/src/main/AndroidManifest.xml`中添添加</br>
 add follow code in `project_root_dir/android/app/src/main/AndroidManifest.xml`
@@ -179,10 +184,10 @@ you can use any strings apply to `app_key` and `app_secret`,if there are any pro
 > 申请注意</br>
 > 1. 申请通用解决方案，同时勾选离线语音合成
 > 2. 下载完成后将`USCDemo\libs\armeabi`中的文件替换掉本仓库`android/libs`中的文件
-> 3. 将下载完成的sdk`USCDemo\assets\OfflineTTSModels`中的文件复制替换掉上面前面创建的`assets`文件夹中的文件
+> 3. 将下载完成的sdk`USCDemo\assets\OfflineTTSModels`中的文件复制替换掉上面前面创建的`assets\tts`文件夹中的文件
 
 :warning:其他注意</br>
->1. 初始化需要加载模型，需要将`assets`的文件复制到存储中，所以需要几秒的时间，期间会导致`app`卡顿（因为没有用单独的线程加载），所以建议使用监听函数做相应的提示<br/>
+>1. 初始化需要加载模型，需要将`assets\tts`的文件复制到存储中，所以需要几秒的时间，期间会导致`app`卡顿（因为没有用单独的线程加载），所以建议使用监听函数做相应的提示<br/>
 > because there are no separate threads, when excuse the `initEngine` function may cause application to jam. you should use initial listener
 >2. 再次提醒，一定要在初始化之后进行其他操作，不然会报错
 ---
