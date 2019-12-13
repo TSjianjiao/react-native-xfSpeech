@@ -43,19 +43,19 @@ const VOLUME_FLAGS = {
     VIBRATE: RNXfSpeech.VIBRATE
 }
 
+const defualtOptions = {
+    streamType: STREAM_TYPE.MUSIC,
+    volume: 100,
+    pitch: 50,
+    speed: 52,
+}
 /**
  * 初始化引擎
  */
-async function initEngine(appkey, secret,
-    options = {
-        streamType: STREAM_TYPE.MUSIC,
-        volume: 100,
-        pitch: 50,
-        speed: 52,
-    }) {
+async function initEngine(appkey, secret, options) {
     // 获取权限
     await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE)
-    RNXfSpeech.initSpeech(appkey, secret, options)
+    RNXfSpeech.initSpeech(appkey, secret, {...defualtOptions, ...options})
 }
 
 /**

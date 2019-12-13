@@ -38,10 +38,10 @@ export interface InitEvent {
 export namespace Utils {
     export function getVolume(): Promise<number>
     export function getMaxVolume(): Promise<number>
-    export function setVolume(value: number, flag: VOLUME_FLAGS): void
+    export function setVolume(value: number, flag?: VOLUME_FLAGS): void
 }
 
-export async function initEngine(appkey:string, secret: string, options: Options): Promise<void>
+export async function initEngine(appkey:string, secret: string, options?: Options): Promise<void>
 export function setInitEngineListener(callback: (event: InitEvent) => any): void
 export function playText(text: string): void
 export function stopPlay(): void
