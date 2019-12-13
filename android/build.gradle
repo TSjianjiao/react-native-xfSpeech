@@ -33,6 +33,12 @@ android {
         abortOnError false
         warning 'InvalidPackage'
     }
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets']
+            jniLibs.srcDirs = ["libs"]
+        }
+    }
 }
 
 repositories {
@@ -46,5 +52,6 @@ repositories {
 }
 
 dependencies {
-    implementation "com.facebook.react:react-native:+"
+    implementation 'com.facebook.react:react-native:+'
+    implementation files('libs/usc.jar')
 }
