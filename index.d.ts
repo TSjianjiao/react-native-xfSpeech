@@ -35,6 +35,10 @@ export interface InitEvent {
     initState: INIT_ENGINE_STATE
 }
 
+export interface ErrorEvent {
+    msg: string
+}
+
 export namespace utils {
     export function getVolume(): Promise<number>
     export function getMaxVolume(): Promise<number>
@@ -42,7 +46,18 @@ export namespace utils {
 }
 
 export function initEngine(appkey:string, secret: string, options?: Options): Promise<void>
+
 export function setInitEngineListener(callback: (event: InitEvent) => any): void
+export function setPlayStartListener(callback: () => any): void
+export function setPlayEndListener(callback: () => any): void
+export function setPauseListener(callback: () => any): void
+export function setStopListener(callback: () => any): void
+export function setResumeListener(callback: () => any): void
+export function setReleaseListener(callback: () => any): void
+export function setErrorListener(callback: (event: ErrorEvent) => any): void
+
 export function playText(text: string): void
 export function stopPlay(): void
+export function pause(): void
+export function resume(): void
 export function release(): void

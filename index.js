@@ -7,6 +7,7 @@ import {
 } from 'react-native'
 
 const { RNXfSpeech } = NativeModules;
+const eventEmitter = new NativeEventEmitter(RNXfSpeech)
 
 /**
  * 初始化状态码
@@ -59,12 +60,79 @@ async function initEngine(appkey, secret, options) {
 }
 
 /**
+ * 防止重复注册事件
+ * @param {string} eventType
+ */
+function preventDuplication(eventType) {
+    if(eventEmitter.listeners(eventType).length > 0) {
+        eventEmitter.removeAllListeners(eventType)
+    }
+}
+
+/**
  * 初始引擎进度监听
  */
 function setInitEngineListener(callback) {
-    const eventEmitter = new NativeEventEmitter(RNXfSpeech)
+    preventDuplication("InitEngine")
     eventEmitter.addListener('InitEngine', callback)
 }
+
+/**
+ * 开始播放事件
+ */
+function setPlayStartListener(callback) {
+    preventDuplication("playingStart")
+    eventEmitter.addListener('playingStart', callback)
+}
+
+/**
+ * 播放结束事件
+ */
+function setPlayEndListener(callback) {
+    preventDuplication("playingEnd")
+    eventEmitter.addListener('playingEnd', callback)
+}
+
+/**
+ * 暂停事件
+ */
+function setPauseListener(callback) {
+    preventDuplication("pause")
+    eventEmitter.addListener('pause', callback)
+}
+
+/**
+ * 停止事件
+ */
+function setStopListener(callback) {
+    preventDuplication("stop")
+    eventEmitter.addListener('stop', callback)
+}
+
+/**
+ * 恢复事件
+ */
+function setResumeListener(callback) {
+    preventDuplication("resume")
+    eventEmitter.addListener('resume', callback)
+}
+
+/**
+ * 释放事件
+ */
+function setReleaseListener(callback) {
+    preventDuplication("release")
+    eventEmitter.addListener('release', callback)
+}
+
+/**
+ * 合成错误事件
+ */
+function setErrorListener(callback) {
+    preventDuplication("error")
+    eventEmitter.addListener('error', callback)
+}
+
 
 /**
  * 语音合成
@@ -79,6 +147,20 @@ function playText(text) {
  */
 function stopPlay() {
     RNXfSpeech.stopPlay()
+}
+
+/**
+ * 暂停
+ */
+function pause() {
+    RNXfSpeech.pause()
+}
+
+/**
+ * 恢复
+ */
+function resume() {
+    RNXfSpeech.resume()
 }
 
 /**
@@ -122,8 +204,17 @@ function setVolume(value, flag = 0) {
 export default {
     initEngine,
     setInitEngineListener,
+    setPlayStartListener,
+    setPlayEndListener,
+    setPauseListener,
+    setStopListener,
+    setResumeListener,
+    setReleaseListener,
+    setErrorListener,
     playText,
     stopPlay,
+    pause,
+    resume,
     release,
     utils: {
         getVolume,

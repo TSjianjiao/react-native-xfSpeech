@@ -225,25 +225,31 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
             break;
           case SpeechConstants.TTS_EVENT_PLAYING_START:
             // 开始播放回调
+            sendEvent(reactContext, "playingStart", Arguments.createMap());
             log_i("onPlayBegin");
             break;
           case SpeechConstants.TTS_EVENT_PLAYING_END:
             // 播放完成回调
+            sendEvent(reactContext, "playingEnd", Arguments.createMap());
             log_i("onPlayEnd");
             break;
           case SpeechConstants.TTS_EVENT_PAUSE:
+            sendEvent(reactContext, "pause", Arguments.createMap());
             // 暂停回调
             log_i("pause");
             break;
           case SpeechConstants.TTS_EVENT_RESUME:
+            sendEvent(reactContext, "resume", Arguments.createMap());
             // 恢复回调
             log_i("resume");
             break;
           case SpeechConstants.TTS_EVENT_STOP:
+            sendEvent(reactContext, "stop", Arguments.createMap());
             // 停止回调
             log_i("stop");
             break;
           case SpeechConstants.TTS_EVENT_RELEASE:
+            sendEvent(reactContext, "release", Arguments.createMap());
             // 释放资源回调
             log_i("release");
             break;
@@ -255,9 +261,12 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
 
       @Override
       public void onError(int type, String errorMSG) {
+        WritableMap error = Arguments.createMap();
+        error.putString("msg", errorMSG);
+        sendEvent(reactContext, "onError", error);
         // 语音合成错误回调
         log_i("onError");
-        toastMessage(errorMSG);
+//        toastMessage(errorMSG);
       }
     });
     // 初始化合成引擎
@@ -271,7 +280,26 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
    */
   @ReactMethod
   public void playText(String text) {
+    if(mTTSPlayer == null) return;
     mTTSPlayer.playText(text);
+  }
+
+  /**
+   * 暂停播放
+   */
+  @ReactMethod
+  public void pause() {
+    if(mTTSPlayer == null) return;
+    mTTSPlayer.pause();
+  }
+
+  /**
+   * 恢复播放
+   */
+  @ReactMethod
+  public void resume() {
+    if(mTTSPlayer == null) return;
+    mTTSPlayer.resume();
   }
 
   /**
@@ -279,6 +307,7 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
    */
   @ReactMethod
   public void stopPlay() {
+    if(mTTSPlayer == null) return;
     mTTSPlayer.stop();
   }
 

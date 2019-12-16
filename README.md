@@ -119,17 +119,25 @@ you should ask the permission `READ_PHONE_STATE` by your self in the right place
 <a href="#setInitEngineListener">2. setInitEngineListener() 设置初始化监听</a></br>
 <a href="#playText">3. playText() 朗读文字</a></br>
 <a href="#stopPlay">4. stopPlay() 停止朗读</a></br>
-<a href="#utils">5. utils 辅助函数</a></br>
-&emsp;<a href="#getVolume">5.1 getVolume() 获取当前系统音量</a></br>
-&emsp;<a href="#getMaxVolume">5.2 getMaxVolume() 获取当前系统最大音量</a></br>
-&emsp;<a href="#setVolume">5.3 setVolume() 设置音量</a></br>
-
+<a href="#pause">5. pause() 暂停播放</a></br>
+<a href="#resume">6. resume() 恢复播放</a></br>
+<a href="#utils">7. utils 辅助函数</a></br>
+&emsp;<a href="#getVolume">7.1 getVolume() 获取当前系统音量</a></br>
+&emsp;<a href="#getMaxVolume">7.2 getMaxVolume() 获取当前系统最大音量</a></br>
+&emsp;<a href="#setVolume">7.3 setVolume() 设置音量</a></br>
+<a href="#setPlayStartListener">8. setPlayStartListener() 开始播放事件</a></br>
+<a href="#setPlayEndListener">9. setPlayEndListener() 播放结束事件</a></br>
+<a href="#setPauseListener">10. setPauseListener() 暂停事件</a></br>
+<a href="#setStopListener">11. setStopListener() 停止事件</a></br>
+<a href="#setResumeListener">12. setResumeListener() 恢复事件</a></br>
+<a href="#setReleaseListener">13. setReleaseListener() 释放资源事件</a></br>
+<a href="#setErrorListener">14. setErrorListener() 合成错误事件</a></br>
 ---
 
 <h2 id="initEngine">initEngine</h2>
 
 ```typescript
-async function initEngine(appkey:string, secret: string, options?: Options): Promise<void>
+function initEngine(appkey:string, secret: string, options?: Options): Promise<void>
 ```
 options 可选Optional
 ```typescript
@@ -258,6 +266,18 @@ text 需要朗读的文本
 function stopPlay(): void
 ```
 ---
+<h2 id="pause">pause 暂停</h2>
+
+```typescript
+function pause(): void
+```
+---
+<h2 id="resume">resume 恢复朗读</h2>
+
+```typescript
+function resume(): void
+```
+---
 <h2 id="release">release 释放资源</h2>
 
 ```typescript
@@ -308,6 +328,54 @@ enum VOLUME_FLAGS {
 		const volume = await tts.utils.getVolume()
 		tts.utils.setVolume(volume, tts.VOLUME_FLAGS.SHOW_UI)
 	}
+```
+---
+<h2 id="setPlayStartListener">setPlayStartListener 播放开始事件</h2>
+
+```typescript
+function setPlayStartListener(callback: () => any): void
+```
+---
+<h2 id="setPlayEndListener">setPlayEndListener 播放结束事件</h2>
+
+```typescript
+function setPlayEndListener(callback: () => any): void
+```
+---
+<h2 id="setPauseListener">setPauseListener 播放暂停事件</h2>
+
+```typescript
+function setPauseListener(callback: () => any): void
+```
+---
+<h2 id="setStopListener">setStopListener 播放停止事件</h2>
+
+```typescript
+function setStopListener(callback: () => any): void
+```
+---
+<h2 id="setResumeListener">setResumeListener 恢复播放事件</h2>
+
+```typescript
+function setResumeListener(callback: () => any): void
+```
+---
+<h2 id="setReleaseListener">setReleaseListener 释放资源事件</h2>
+
+```typescript
+function setReleaseListener(callback: () => any): void
+```
+---
+<h2 id="setErrorListener">setErrorListener 合成错误事件</h2>
+
+```typescript
+function setErrorListener(callback: (event: ErrorEvent) => any): void
+```
+ErrorEvent
+```typescript
+{
+	msg: string
+}
 ```
 
 

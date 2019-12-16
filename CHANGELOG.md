@@ -21,3 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 修复文档几处错误
 - 修复几处typings错误
 
+## [1.0.2]
+### Added
+- 增加播放语音的几个事件
+- 增加播放暂停和恢复功能
+### Changed
+- 现在事件只能注册一次，重复注册的事件以最新的为准
