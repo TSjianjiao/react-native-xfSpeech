@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 public class FileUtils {
 
     /**
@@ -19,7 +21,7 @@ public class FileUtils {
      * @throws IOException
      */
     public static void copyFromAssets(AssetManager assetsManager,
-                                      String source, String dest, boolean isCover, FileCopyProgress progressCallback)
+                                      String source, String dest, boolean isCover, @Nullable FileCopyProgress progressCallback)
     throws IOException {
         File file = new File(dest);
         if (isCover || (!isCover && !file.exists())) {
@@ -36,7 +38,9 @@ public class FileUtils {
                 while ((size = is.read(buffer, 0, 1024)) >= 0) {
                     fos.write(buffer, 0, size);
                     hasDone += size;
-                    progressCallback.onProgress((double)hasDone / (double)totalSize, source);
+                    if(progressCallback != null) {
+                        progressCallback.onProgress((double)hasDone / (double)totalSize, source);
+                    }
 //                    Log.i("语音", (double)hasDone / (double)totalSize+"");
                 }
             } finally {

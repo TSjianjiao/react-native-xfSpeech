@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -38,7 +39,6 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
 
   private final ReactApplicationContext reactContext;
   private SpeechSynthesizer mTTSPlayer;
-  private AssetManager assetManager;
   private String mFrontendModel;
   private String mBackendModel;
   private AudioManager audioManager;
@@ -120,7 +120,6 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
    */
   @ReactMethod
   public void initSpeech(String appKey, String secret, @Nullable ReadableMap options) {
-    assetManager = reactContext.getAssets();
     mOptions = options;
     release();
 
@@ -143,135 +142,99 @@ public class RNXfSpeechModule extends ReactContextBaseJavaModule implements Life
     params_1.putInt("initState", 0);
     sendEvent(reactContext, "InitEngine", params_1);
 
-    FileCopyProgress processCallback = new FileCopyProgress() {
-      private int count = 0;
-      private String lastFilePath = "";
-      private String lastProgress = "";
-      @Override
-      public void onProgress(Double progress, String filePath) {
-        String progressStr = String.format("%.2f", progress);
-        if(!lastFilePath.equals(filePath)) {
-          count++;
-          lastFilePath = filePath;
-        }
-        if(!lastProgress.equals(progressStr)) {
-          WritableMap params_2 = Arguments.createMap();
-          params_2.putDouble("progress", Double.parseDouble(progressStr));
-          params_2.putInt("fileCount", count);
-          params_2.putInt("initState", 1);
-          sendEvent(reactContext, "InitEngine", params_2);
-//          log_i("第"+ count + "个文件");
-//          log_i(progressStr);
-          lastProgress = progressStr;
-        }
-      }
-    };
+    // TODO 读取文件列表 动态获取长度
+    Models list[] = new Models[2];
+    list[0] = new Models("tts/backend_lzl", mBackendModel, false);
+    list[1] = new Models("tts/frontend_model", mFrontendModel, false);
+    AsyncTasks.copyModels task = new AsyncTasks.copyModels(reactContext, list, new AsyncTasks.copyModels.Callback() {
+        @Override
+        public void onCopyModelComplete() {
+            // 设置前端模型
+            mTTSPlayer.setOption(SpeechConstants.TTS_KEY_FRONTEND_MODEL_PATH, mFrontendModel);
+            // 设置后端模型
+            mTTSPlayer.setOption(SpeechConstants.TTS_KEY_BACKEND_MODEL_PATH, mBackendModel);
+            // 设置回调监听
+            mTTSPlayer.setTTSListener(new SpeechSynthesizerListener() {
 
-    WritableMap params_3 = Arguments.createMap();
-    try {
-      assetManager.open("tts/backend_lzl");
-      assetManager.open("tts/frontend_model");
-      FileUtils.copyFromAssets(assetManager, "tts/backend_lzl", mBackendModel, false, processCallback);
-      FileUtils.copyFromAssets(assetManager, "tts/frontend_model", mFrontendModel, false, processCallback);
-    }catch (FileNotFoundException err) {
-      log_i("缺少SDK文件");
-//      toastMessage("初始化失败，缺少SDK文件");
-      params_3.putDouble("progress", Double.parseDouble("0"));
-      params_3.putInt("fileCount", 0);
-      params_3.putInt("initState", 2);
-      sendEvent(reactContext, "InitEngine", params_3);
-    }catch (IOException err) {
-      err.printStackTrace();
-      params_3.putDouble("progress", Double.parseDouble("0"));
-      params_3.putInt("fileCount", 1);
-      params_3.putInt("initState", 3);
-      sendEvent(reactContext, "InitEngine", params_3);
-    }
+                @Override
+                public void onEvent(int type) {
+                    switch (type) {
+                        case SpeechConstants.TTS_EVENT_INIT:
+                            // 初始化成功回调！！！
+                            WritableMap params = Arguments.createMap();
+                            params.putDouble("progress", Double.parseDouble("0"));
+                            params.putInt("fileCount", 2);
+                            params.putInt("initState", 4);
+                            sendEvent(reactContext, "InitEngine", params);
+                            log_i("onInitFinish");
+                            break;
+                        case SpeechConstants.TTS_EVENT_SYNTHESIZER_START:
+                            // 开始合成回调
+                            log_i("beginSynthesizer");
+                            break;
+                        case SpeechConstants.TTS_EVENT_SYNTHESIZER_END:
+                            // 合成结束回调
+                            log_i("endSynthesizer");
+                            break;
+                        case SpeechConstants.TTS_EVENT_BUFFER_BEGIN:
+                            // 开始缓存回调
+                            log_i("beginBuffer");
+                            break;
+                        case SpeechConstants.TTS_EVENT_BUFFER_READY:
+                            // 缓存完毕回调
+                            log_i("bufferReady");
+                            break;
+                        case SpeechConstants.TTS_EVENT_PLAYING_START:
+                            // 开始播放回调
+                            sendEvent(reactContext, "playingStart", Arguments.createMap());
+                            log_i("onPlayBegin");
+                            break;
+                        case SpeechConstants.TTS_EVENT_PLAYING_END:
+                            // 播放完成回调
+                            sendEvent(reactContext, "playingEnd", Arguments.createMap());
+                            log_i("onPlayEnd");
+                            break;
+                        case SpeechConstants.TTS_EVENT_PAUSE:
+                            sendEvent(reactContext, "pause", Arguments.createMap());
+                            // 暂停回调
+                            log_i("pause");
+                            break;
+                        case SpeechConstants.TTS_EVENT_RESUME:
+                            sendEvent(reactContext, "resume", Arguments.createMap());
+                            // 恢复回调
+                            log_i("resume");
+                            break;
+                        case SpeechConstants.TTS_EVENT_STOP:
+                            sendEvent(reactContext, "stop", Arguments.createMap());
+                            // 停止回调
+                            log_i("stop");
+                            break;
+                        case SpeechConstants.TTS_EVENT_RELEASE:
+                            sendEvent(reactContext, "release", Arguments.createMap());
+                            // 释放资源回调
+                            log_i("release");
+                            break;
+                        default:
+                            break;
+                    }
 
-    // 设置前端模型
-    mTTSPlayer.setOption(SpeechConstants.TTS_KEY_FRONTEND_MODEL_PATH, mFrontendModel);
-    // 设置后端模型
-    mTTSPlayer.setOption(SpeechConstants.TTS_KEY_BACKEND_MODEL_PATH, mBackendModel);
-    // 设置回调监听
-    mTTSPlayer.setTTSListener(new SpeechSynthesizerListener() {
+                }
 
-      @Override
-      public void onEvent(int type) {
-        switch (type) {
-          case SpeechConstants.TTS_EVENT_INIT:
-            // 初始化成功回调！！！
-            WritableMap params = Arguments.createMap();
-            params.putDouble("progress", Double.parseDouble("0"));
-            params.putInt("fileCount", 0);
-            params.putInt("initState", 4);
-            sendEvent(reactContext, "InitEngine", params);
-            log_i("onInitFinish");
-            break;
-          case SpeechConstants.TTS_EVENT_SYNTHESIZER_START:
-            // 开始合成回调
-            log_i("beginSynthesizer");
-            break;
-          case SpeechConstants.TTS_EVENT_SYNTHESIZER_END:
-            // 合成结束回调
-            log_i("endSynthesizer");
-            break;
-          case SpeechConstants.TTS_EVENT_BUFFER_BEGIN:
-            // 开始缓存回调
-            log_i("beginBuffer");
-            break;
-          case SpeechConstants.TTS_EVENT_BUFFER_READY:
-            // 缓存完毕回调
-            log_i("bufferReady");
-            break;
-          case SpeechConstants.TTS_EVENT_PLAYING_START:
-            // 开始播放回调
-            sendEvent(reactContext, "playingStart", Arguments.createMap());
-            log_i("onPlayBegin");
-            break;
-          case SpeechConstants.TTS_EVENT_PLAYING_END:
-            // 播放完成回调
-            sendEvent(reactContext, "playingEnd", Arguments.createMap());
-            log_i("onPlayEnd");
-            break;
-          case SpeechConstants.TTS_EVENT_PAUSE:
-            sendEvent(reactContext, "pause", Arguments.createMap());
-            // 暂停回调
-            log_i("pause");
-            break;
-          case SpeechConstants.TTS_EVENT_RESUME:
-            sendEvent(reactContext, "resume", Arguments.createMap());
-            // 恢复回调
-            log_i("resume");
-            break;
-          case SpeechConstants.TTS_EVENT_STOP:
-            sendEvent(reactContext, "stop", Arguments.createMap());
-            // 停止回调
-            log_i("stop");
-            break;
-          case SpeechConstants.TTS_EVENT_RELEASE:
-            sendEvent(reactContext, "release", Arguments.createMap());
-            // 释放资源回调
-            log_i("release");
-            break;
-          default:
-            break;
-        }
-
-      }
-
-      @Override
-      public void onError(int type, String errorMSG) {
-        WritableMap error = Arguments.createMap();
-        error.putString("msg", errorMSG);
-        sendEvent(reactContext, "onError", error);
-        // 语音合成错误回调
-        log_i("onError");
+                @Override
+                public void onError(int type, String errorMSG) {
+                    WritableMap error = Arguments.createMap();
+                    error.putString("msg", errorMSG);
+                    sendEvent(reactContext, "onError", error);
+                    // 语音合成错误回调
+                    log_i("onError");
 //        toastMessage(errorMSG);
-      }
+                }
+            });
+            // 初始化合成引擎
+            mTTSPlayer.init("");
+        }
     });
-    // 初始化合成引擎
-    mTTSPlayer.init("");
-    WritableMap params_5 = Arguments.createMap();
+    task.execute();
   }
 
   /**

@@ -27,3 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 增加播放暂停和恢复功能
 ### Changed
 - 现在事件只能注册一次，重复注册的事件以最新的为准
+
+## [1.1.0]
+### Changed
+- 现在复制文件使用多线程操作，不会阻塞`ui`
+
+## [1.1.1]
+### Changed
+- 初始化结束时，进度不会为`1`而是`0`方便判断是否展示进度弹窗
+
